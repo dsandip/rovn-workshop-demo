@@ -27,34 +27,25 @@ jobs:
 
           WEBHOOK_URL="https://sandip-test.axiom-hasura.private-ddn.hasura.app/promptql-v2/hooks/room/36ffdf7e-674c-4fc3-a18c-1046375a6719/send_message"
 
-          # Build a prompt telling the bot exactly what to do with this issue.
-          read -r -d '' PROMPT <<'EOF' || true
-New GitHub issue opened in REPO_PLACEHOLDER — please handle it end-to-end following the Rovn shipping loop:
-1. Read the issue below.
-2. Create a branch and implement the change.
-3. Add/run tests.
-4. Open a pull request referencing the issue, and wait for a human to review, approve, and merge.
-Do NOT merge on your own — a human approves and merges, which triggers the Pages deploy.
+          # Build the prompt telling the bot exactly what to do with this issue.
+          # printf keeps every line inside the YAML block scalar (no heredoc).
+          PROMPT=$(printf '%s\n' \
+            "New GitHub issue opened in ${REPO} — please handle it end-to-end following the Rovn shipping loop:" \
+            "1. Read the issue below." \
+            "2. Create a branch and implement the change." \
+            "3. Add/run tests." \
+            "4. Open a pull request referencing the issue, then wait for a human to review, approve, and merge." \
+            "Do NOT merge on your own — a human approves and merges, which triggers the Pages deploy." \
+            "" \
+            "--- ISSUE ---" \
+            "Repo:   ${REPO}" \
+            "Issue:  #${ISSUE_NUMBER} — ${ISSUE_TITLE}" \
+            "Author: ${ISSUE_AUTHOR}" \
+            "Link:   ${ISSUE_URL}" \
+            "" \
+            "${ISSUE_BODY}")
 
---- ISSUE ---
-Repo:    REPO_PLACEHOLDER
-Issue:   #ISSUE_NUMBER_PLACEHOLDER — ISSUE_TITLE_PLACEHOLDER
-Author:  ISSUE_AUTHOR_PLACEHOLDER
-Link:    ISSUE_URL_PLACEHOLDER
-
-ISSUE_BODY_PLACEHOLDER
-EOF
-
-          # Substitute the runtime values (safe: done via jq, not shell interpolation).
-          PROMPT="${PROMPT//REPO_PLACEHOLDER/$REPO}"
-          PROMPT="${PROMPT//ISSUE_NUMBER_PLACEHOLDER/$ISSUE_NUMBER}"
-          PROMPT="${PROMPT//ISSUE_TITLE_PLACEHOLDER/$ISSUE_TITLE}"
-          PROMPT="${PROMPT//ISSUE_AUTHOR_PLACEHOLDER/$ISSUE_AUTHOR}"
-          PROMPT="${PROMPT//ISSUE_URL_PLACEHOLDER/$ISSUE_URL}"
-          PROMPT="${PROMPT//ISSUE_BODY_PLACEHOLDER/$ISSUE_BODY}"
-
-          # Send the prompt as the message text (query param), and the raw issue
-          # payload as the JSON body artifact for the bot to read if it wants.
+          # Raw issue payload as a JSON body artifact the bot can read if it wants.
           jq -n \
             --arg title "$ISSUE_TITLE" \
             --arg body "$ISSUE_BODY" \
