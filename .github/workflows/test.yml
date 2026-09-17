@@ -1,5 +1,9 @@
-name: Tests
+name: CI — Tests
 
+# CANNED CI: this is the fixed "Tests" phase of the shipping loop.
+# It is committed into the repo (not generated per-issue) so every branch and
+# PR runs the exact same checks. GitHub Actions today, but the pattern is
+# system-agnostic — the phase is what matters, not the runner.
 on:
   push:
     branches: ["**"]
@@ -11,8 +15,23 @@ permissions:
 
 jobs:
   test:
+    name: Run canned test suite
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run counter test
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: JS counter test
         run: node test/counter.test.js
+
+      - name: Python counter test
+        run: python test/counter.test.py
