@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rōvn × PromptQL — Shipping Loop Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Rōvn × PromptQL</p>
+      <h1>The Shipping Loop, Live</h1>
+      <p class="tagline">Issue → branch → AI implementation → tests → PR → human approval → merge → deploy → monitor.</p>
+      <p class="build" id="build-stamp">deploy pending…</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>How this page got here</h2>
+      <ol class="loop">
+        <li><strong>Issue opened</strong> — a GitHub issue kicks off the work and (via the bridge) spins up a PromptQL bot.</li>
+        <li><strong>Branch + AI implementation</strong> — the bot writes the change on a feature branch.</li>
+        <li><strong>Tests</strong> — CI validates the change before a human ever looks.</li>
+        <li><strong>Pull request</strong> — the bot opens a PR describing what and why.</li>
+        <li><strong>Human approval</strong> — a reviewer approves. Nothing ships without this gate.</li>
+        <li><strong>Merge → deploy</strong> — merge to <code>main</code> triggers the Pages deploy that published this exact page.</li>
+        <li><strong>Monitor</strong> — the loop closes; the next issue starts it again.</li>
+      </ol>
+    </section>
+
+    <section class="counter-demo">
+      <h2>A changeable thing</h2>
+      <p>This number is what a workshop PR will bump — a tiny, visible diff that proves the whole loop end to end.</p>
+      <p class="counter" id="counter">1</p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>Built with PromptQL · a hands-on workshop demo</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
