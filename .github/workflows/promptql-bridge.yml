@@ -1,7 +1,9 @@
 name: Issue → PromptQL bridge
 
 # When a new issue is opened, POST it to a PromptQL room webhook so a bot
-# spins up to handle it (implement → tests → PR → human approval → merge → deploy).
+# spins up. The bot only REGISTERS the issue and hands it to a human — the
+# coding step (branch → tests → PR) is triggered by the Rovn user themselves
+# so it runs under THEIR GitHub credentials (PR authored by them).
 on:
   issues:
     types: [opened]
@@ -27,19 +29,24 @@ jobs:
 
           WEBHOOK_URL="https://p-80843914-3fdd.rovn-rovn.private-ddn.hasura.app/promptql-v2/hooks/room/c98f0d64-6899-4204-9cfc-0193262b1898/send_message"
 
-          # Build the prompt telling the bot exactly what to do with this issue.
+          # The bridge only REGISTERS the issue and hands it off to a human.
+          # The coding step must be triggered by the Rovn user themselves so the
+          # bot runs under THEIR GitHub credentials and the PR is authored by them.
           # printf keeps every line inside the YAML block scalar (no heredoc).
           PROMPT=$(printf '%s\n' \
-            "New GitHub issue opened in ${REPO} — please handle it end-to-end following the Rovn shipping loop:" \
-            "1. Read the issue below." \
-            "2. Create a branch and implement the change." \
-            "3. Add/run tests." \
-            "4. Open a pull request referencing the issue, then wait for a human to review, approve, and merge." \
-            "Do NOT merge on your own — a human approves and merges, which triggers the Pages deploy." \
+            "A new GitHub issue was opened in ${REPO}. Do NOT start coding yet." \
+            "" \
+            "Right now, do ONLY this:" \
+            "1. Set your title to \"${ISSUE_AUTHOR} - new issue: ${ISSUE_TITLE}\" (use the issuer's first name if you can resolve it, otherwise their GitHub login)." \
+            "2. Post a short summary of the issue with its link." \
+            "3. Ask the Rovn user who owns this issue to tag you in this thread to begin. Explain that the coding step (branch, implement, tests, open PR) will run under THEIR identity so the PR is opened with their own GitHub account, and that they must connect their GitHub to PromptQL first if they have not already." \
+            "4. State clearly that you will NOT branch, implement, or open a PR until a human tags you — then end your turn and wait." \
+            "" \
+            "ONLY when a human later tags you to proceed: run the full Rovn shipping loop under that human's identity — create a branch, implement the change, add/run tests, open a pull request referencing the issue, then wait for a human to review, approve, and merge. Never merge on your own; a human approves and merges, which triggers the Pages deploy." \
             "" \
             "--- ISSUE ---" \
             "Repo:   ${REPO}" \
-            "Issue:  #${ISSUE_NUMBER} — ${ISSUE_TITLE}" \
+            "Issue:  #${ISSUE_NUMBER} - ${ISSUE_TITLE}" \
             "Author: ${ISSUE_AUTHOR}" \
             "Link:   ${ISSUE_URL}" \
             "" \
