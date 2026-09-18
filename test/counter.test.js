@@ -12,7 +12,7 @@ if (!match) {
 }
 
 const value = parseInt(match[1], 10);
-const expected = 2;
+const expected = 3;
 
 if (value !== expected) {
   console.error(`FAIL: expected counter to be ${expected}, got ${value}`);
