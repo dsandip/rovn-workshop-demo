@@ -10,7 +10,7 @@ if not match:
     sys.exit(1)
 
 value = int(match.group(1))
-expected = 3
+expected = 6218
 if value != expected:
     print(f"FAIL: expected counter to be {expected}, got {value}")
     sys.exit(1)
